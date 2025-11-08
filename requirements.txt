@@ -1,0 +1,25 @@
+# Core AI and ML libraries
+langchain
+langchain-google-genai
+sentence-transformers
+transformers
+torch
+accelerate
+
+# Data processing and utilities
+numpy
+scikit-learn
+pandas
+
+# Retrieval Module Dependencies
+datasets
+wikipedia
+chromadb
+nltk
+beautifulsoup4
+
+# Environment and configuration
+python-dotenv
+
+# For progress bars
+tqdm

@@ -1,0 +1,48 @@
+# Environment variables
+# Contains sensitive API keys and should NEVER be committed.
+.env
+
+# Python virtual environment
+# Common names for virtual environment folders
+venv/
+env/
+*.venv/
+.venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# IDE and editor configuration
+.vscode/
+.idea/
+
+# Local database files
+# ChromaDB local storage directory
+chroma_db/
+*.db
+*.sqlite3
+
+# NLTK data
+# This can be large and should be downloaded by users as needed.
+nltk_data/
+
+# Build artifacts and distribution files
+build/
+dist/
+*.egg-info/
+
+# Test artifacts
+.pytest_cache/
+.tox/
+htmlcov/
+.coverage
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+
+benchmark_runner.py

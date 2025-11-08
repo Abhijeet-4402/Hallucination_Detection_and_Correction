@@ -1,0 +1,77 @@
+<<<<<<< HEAD
+# Sample Questions for AI Hallucination Detection Testing
+
+## Geography Questions
+What is the capital of France?
+What is the largest country in the world by area?
+Which ocean is the largest?
+What is the capital of Japan?
+
+## Science Questions
+What is photosynthesis?
+What is the chemical symbol for gold?
+What is the speed of light?
+What is the atomic number of carbon?
+
+## Literature Questions
+Who wrote Romeo and Juliet?
+Who wrote 1984?
+What is the main theme of To Kill a Mockingbird?
+Who wrote The Great Gatsby?
+
+## History Questions
+When did World War II end?
+Who was the first president of the United States?
+What year did the Berlin Wall fall?
+Who discovered America?
+
+## Technology Questions
+What is machine learning?
+What is the difference between AI and ML?
+What is blockchain technology?
+What is cloud computing?
+
+## Mixed Questions (for hallucination testing)
+What is the capital of Australia?
+Who painted the Mona Lisa?
+What is the largest planet in our solar system?
+What is the currency of Japan?
+=======
+# Sample Questions for AI Hallucination Detection Testing
+
+## Geography Questions
+What is the capital of France?
+What is the largest country in the world by area?
+Which ocean is the largest?
+What is the capital of Japan?
+
+## Science Questions
+What is photosynthesis?
+What is the chemical symbol for gold?
+What is the speed of light?
+What is the atomic number of carbon?
+
+## Literature Questions
+Who wrote Romeo and Juliet?
+Who wrote 1984?
+What is the main theme of To Kill a Mockingbird?
+Who wrote The Great Gatsby?
+
+## History Questions
+When did World War II end?
+Who was the first president of the United States?
+What year did the Berlin Wall fall?
+Who discovered America?
+
+## Technology Questions
+What is machine learning?
+What is the difference between AI and ML?
+What is blockchain technology?
+What is cloud computing?
+
+## Mixed Questions (for hallucination testing)
+What is the capital of Australia?
+Who painted the Mona Lisa?
+What is the largest planet in our solar system?
+What is the currency of Japan?
+>>>>>>> fb3451155c14f135a09046a366815aba1850f393
