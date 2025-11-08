@@ -1,12 +1,3 @@
-"""
-Core Detection Logic for AI Hallucination Detection (Optimized with Batching)
-
-This module implements a robust, claim-level, three-step hallucination detection process.
-NLI inference is now batched for significant performance improvement.
-"""
-
-# FIX: This import MUST be at the top of the file.
-# It solves the NameError by letting Python handle type hints more flexibly.
 from __future__ import annotations
 
 import numpy as np
@@ -18,11 +9,9 @@ import torch
 from nltk.tokenize import sent_tokenize
 import nltk
 
-# Configure logging FIRST, so the logger is available for all subsequent calls.
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Download the necessary NLTK tokenizer models if they are not already present.
 try:
     nltk.data.find('tokenizers/punkt')
 except LookupError:
@@ -31,7 +20,6 @@ except LookupError:
 
 
 class DetectionResult:
-    """Container for detection results with detailed analysis."""
     def __init__(self, is_hallucination: bool, confidence_score: float,
                  detection_method: str, raw_answer: str, evidence_docs: List[str],
                  details: Dict[str, Any] = None):
@@ -43,7 +31,6 @@ class DetectionResult:
         self.details = details or {}
 
     def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary for easy serialization."""
         return {
             'is_hallucination': self.is_hallucination,
             'confidence_score': self.confidence_score,
@@ -54,7 +41,6 @@ class DetectionResult:
         }
 
 class HallucinationDetector:
-    """Main class for hallucination detection with batched NLI inference."""
 
     def __init__(self,
                  similarity_model: str = "all-MiniLM-L6-v2",
@@ -76,7 +62,6 @@ class HallucinationDetector:
         self.ENTAILMENT_INDEX = 2
 
     def _load_models(self, similarity_model_name: str, nli_model_name: str):
-        """Load the required ML models."""
         try:
             logger.info(f"Loading semantic similarity model: {similarity_model_name}")
             self.similarity_model = SentenceTransformer(similarity_model_name, device=self.device)
@@ -84,7 +69,7 @@ class HallucinationDetector:
             logger.info(f"Loading NLI model: {nli_model_name}")
             self.nli_tokenizer = AutoTokenizer.from_pretrained(nli_model_name)
             self.nli_model = AutoModelForSequenceClassification.from_pretrained(nli_model_name).to(self.device)
-            self.nli_model.eval() # Set model to evaluation mode
+            self.nli_model.eval()
 
             logger.info("Models loaded successfully!")
 
@@ -93,9 +78,6 @@ class HallucinationDetector:
             raise
 
     def detect_hallucination(self, answer: str, evidence_docs: List[str]) -> DetectionResult:
-        """
-        Detects hallucination using an efficient batched NLI workflow.
-        """
         if not answer.strip():
             return DetectionResult(False, 1.0, "empty_answer", answer, evidence_docs, details={"reason": "Answer was empty."})
 
@@ -109,10 +91,10 @@ class HallucinationDetector:
             return DetectionResult(True, 1.0, "no_evidence", answer, evidence_docs, details={"reason": "Evidence documents contain no text."})
 
         for claim in answer_claims:
-            # --- Step 1 & 2: Batched NLI Check ---
             nli_pairs = [(evidence_sent, claim) for evidence_sent in all_evidence_sentences]
 
-            if not nli_pairs: continue
+            if not nli_pairs:
+                continue
 
             tokenized_input = self.nli_tokenizer(nli_pairs, padding=True, truncation=True, return_tensors="pt", max_length=512).to(self.device)
 
@@ -138,7 +120,6 @@ class HallucinationDetector:
                 logger.warning(f"Contradiction detected for claim: '{claim}'")
                 return DetectionResult(True, max_contradiction_score.item(), "contradiction", answer, evidence_docs, details)
 
-            # --- Step 3: Fallback to Semantic Similarity ---
             claim_embedding = self.similarity_model.encode(claim, convert_to_tensor=True)
             evidence_embeddings = self.similarity_model.encode(all_evidence_sentences, convert_to_tensor=True)
 
