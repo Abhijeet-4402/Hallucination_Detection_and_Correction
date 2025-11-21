@@ -1,52 +1,168 @@
 import streamlit as st
 import requests
+import os
 
-st.title("AI Hallucination Detector")
-st.markdown("This app checks answers for hallucinations using a Flask backend.")
+# --- Configuration ---
+st.set_page_config(
+    page_title="Hallucination Detector",
+    page_icon="🛡️",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-API_URL = "http://127.0.0.1:5000/detect_hallucination"
+API_URL = os.getenv("API_URL", "http://127.0.0.1:5000/detect_hallucination")
 
-user_question = st.text_input("❓ Enter your question here:")
+# --- Custom CSS ---
+st.markdown("""
+<style>
+    /* Main container styling */
+    .main {
+        background-color: #0e1117;
+    }
+    
+    /* Card styling */
+    .stCard {
+        background-color: #262730;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+    
+    /* Headers */
+    h1, h2, h3 {
+        color: #fafafa;
+        font-family: 'Inter', sans-serif;
+    }
+    
+    /* Answer boxes */
+    .answer-box {
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 10px;
+        font-size: 16px;
+        line-height: 1.6;
+        color: #e0e0e0;
+    }
+    
+    .raw-answer {
+        background-color: #3d1e1e; /* Dark Red tint */
+        border-left: 5px solid #ff4b4b;
+    }
+    
+    .corrected-answer {
+        background-color: #1e3d2b; /* Dark Green tint */
+        border-left: 5px solid #00cc96;
+    }
+    
+    /* Metrics */
+    div[data-testid="stMetricValue"] {
+        font-size: 2rem;
+        color: #00cc96;
+    }
+    
+    /* Button */
+    .stButton button {
+        width: 100%;
+        background-color: #ff4b4b;
+        color: white;
+        font-weight: bold;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        border: none;
+    }
+    .stButton button:hover {
+        background-color: #ff3333;
+        border: none;
+    }
 
-if st.button("🚀 Get Fact-Checked Answer"):
+</style>
+""", unsafe_allow_html=True)
+
+# --- Sidebar ---
+with st.sidebar:
+    st.title("🛡️ AI Guard")
+    st.markdown("### Settings")
+    st.info("Backend is running on: " + API_URL)
+    st.markdown("---")
+    st.markdown("### About")
+    st.markdown(
+        "This tool uses **Gemini 2.5 Flash** to generate answers and verifies them against **Wikipedia** to detect and correct hallucinations."
+    )
+
+# --- Main Content ---
+st.title("AI Hallucination Detection & Correction")
+st.markdown("#### Ensure your AI responses are grounded in reality.")
+
+st.markdown("---")
+
+user_question = st.text_input("Enter your question:", placeholder="e.g., Who is the Prime Minister of Mars?")
+
+if st.button("Analyze Question"):
     if user_question:
-        with st.spinner(f"Querying Backend for: '{user_question}'..."):
+        with st.spinner("🔍 Analyzing... Retrieving evidence, generating answer, and verifying facts..."):
             try:
                 response = requests.post(API_URL, json={'question': user_question})
                 
                 if response.status_code == 200:
                     result = response.json()
-                    st.success("Analysis Complete!")
                     
                     raw_answer = result.get("raw_answer", "N/A")
                     corrected_answer = result.get("corrected_answer", "N/A")
                     confidence_score = result.get("confidence_score", 0.0)
+                    is_hallucination = result.get("is_hallucination", False)
+                    citations = result.get("citations", []) # Assuming API returns citations now or we mock them
+
+                    # --- Results Section ---
+                    st.markdown("### Analysis Results")
                     
-                    st.subheader(f"Results for: *{user_question}*")
+                    # Top Metrics
+                    m1, m2, m3 = st.columns(3)
+                    with m1:
+                        st.metric("Status", "Hallucination Detected" if is_hallucination else "Verified", delta_color="inverse" if is_hallucination else "normal")
+                    with m2:
+                        st.metric("Confidence Score", f"{int(confidence_score * 100)}%")
+                    with m3:
+                        st.metric("Evidence Sources", "Wikipedia")
+
                     st.markdown("---")
 
+                    # Answer Comparison
                     col1, col2 = st.columns(2)
                     
                     with col1:
-                        st.error("🚨 Raw Answer (Potential Hallucination)")
-                        st.code(raw_answer, language='text')
-                        st.caption("This is the initial, ungrounded response from the LLM.")
+                        st.markdown("#### 🚨 Raw AI Response")
+                        st.markdown(f"""
+                        <div class="answer-box raw-answer">
+                            {raw_answer}
+                        </div>
+                        """, unsafe_allow_html=True)
+                        st.caption("Generated by Gemini 2.5 Flash (potentially ungrounded)")
 
                     with col2:
-                        st.success("✅ Corrected Answer (Grounded Evidence)")
-                        st.code(corrected_answer, language='text')
-                        st.caption("This answer has been regenerated using evidence from Wikipedia.")
+                        st.markdown("#### ✅ Corrected & Grounded")
+                        st.markdown(f"""
+                        <div class="answer-box corrected-answer">
+                            {corrected_answer}
+                        </div>
+                        """, unsafe_allow_html=True)
+                        st.caption("Verified against retrieved evidence")
 
-                    st.markdown("---")
-                    st.metric(
-                        label="Confidence Score",
-                        value=f"{int(confidence_score * 100)}%",
-                        delta="Higher is better"
-                    )
-                    st.text("Citations: Retrieved from Wikipedia/ChromaDB (Simulated)")
+                    # Citations / Details
+                    with st.expander("📚 View Evidence & Citations"):
+                        if citations:
+                            for i, cite in enumerate(citations):
+                                st.markdown(f"**{i+1}.** {cite}")
+                        else:
+                            st.info("No specific citations returned or evidence was implicit.")
+
                 else:
                     st.error(f"Error connecting to backend API: {response.status_code} - {response.text}")
             except requests.exceptions.ConnectionError:
-                st.error("Could not connect to the Flask backend. Make sure `api.py` is running on http://127.0.0.1:5000.")
+                st.error("Could not connect to the Flask backend. Make sure `api.py` is running.")
     else:
-        st.warning("Please enter a question to start the detection process!")
+        st.warning("Please enter a question to start.")
+
+# --- Footer ---
+st.markdown("---")
+st.markdown("<div style='text-align: center; color: #666;'>Built with Streamlit, Flask, & Gemini</div>", unsafe_allow_html=True)

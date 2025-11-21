@@ -23,3 +23,6 @@ python-dotenv
 
 # For progress bars
 tqdm
+flask
+streamlit
+google-generativeai

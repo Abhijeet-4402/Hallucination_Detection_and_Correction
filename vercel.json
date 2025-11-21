@@ -1,0 +1,17 @@
+{
+    "builds": [
+        {
+            "src": "Frontend Code/api.py",
+            "use": "@vercel/python"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "Frontend Code/api.py"
+        }
+    ],
+    "env": {
+        "DISABLE_DB_LOGGING": "true"
+    }
+}

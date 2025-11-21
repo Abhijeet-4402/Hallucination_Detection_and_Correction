@@ -16,6 +16,12 @@ except LookupError:
     logger.info("NLTK 'punkt' resource not found. Downloading...")
     nltk.download('punkt')
 
+try:
+    nltk.data.find('tokenizers/punkt_tab')
+except LookupError:
+    logger.info("NLTK 'punkt_tab' resource not found. Downloading...")
+    nltk.download('punkt_tab')
+
 class EvidenceRetriever:
     def __init__(self, 
                  embedding_model: str = "all-MiniLM-L6-v2",

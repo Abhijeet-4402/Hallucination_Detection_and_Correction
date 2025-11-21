@@ -15,7 +15,7 @@ class GeminiLLM:
     def __init__(self, api_key: Optional[str] = None, model_name: Optional[str] = None):
         logger.info("Initializing Gemini LLM via LangChain...")
         self.api_key = api_key or os.getenv("GEMINI_API_KEY")
-        self.model_name = model_name or os.getenv("GEMINI_MODEL", "gemini-pro")
+        self.model_name = model_name or os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
         self.model = None
         self.api_working = False
         self._initialize_llm()
